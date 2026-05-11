@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeStay Student - Safe Accommodation for Students</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        /* Color Theme */
+        :root {
+            --primary-blue: #2563eb;
+            --primary-dark: #1e40af;
+            --white: #ffffff;
+            --light-grey: #f3f4f6;
+            --grey: #9ca3af;
+            --green: #10b981;
+            --red: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+
+        .logo span {
+            color: var(--green);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-blue);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-danger {
+            background: var(--red);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-success {
+            background: var(--green);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Search Bar */
+        .search-section {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+            padding: 3rem;
+            border-radius: 16px;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .search-bar input {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        /* Filters */
+        .filters {
+            background: var(--white);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .filter-group label {
+            font-size: 0.75rem;
+            color: var(--grey);
+        }
+
+        .filter-group select, .filter-group input {
+            padding: 0.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+        }
+
+        /* Card Grid */
+        .listings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .listing-card {
+            background: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .listing-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+
+        .card-image {
+            height: 180px;
+            background: var(--light-grey);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--grey);
+            position: relative;
+        }
+
+        .verified-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--green);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .card-content {
+            padding: 1rem;
+        }
+
+        .price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+
+        .address {
+            color: var(--grey);
+            font-size: 0.875rem;
+            margin: 0.5rem 0;
+        }
+
+        .amenities {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .amenity {
+            background: var(--light-grey);
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .close-modal {
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+        }
+
+        /* Rating Stars */
+        .rating-input {
+            display: flex;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .star {
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--grey);
+        }
+
+        .star.active {
+            color: #fbbf24;
+        }
+
+        /* Bottom Navigation (Mobile) */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            padding: 0.75rem;
+            justify-content: space-around;
+            border-top: 1px solid #e5e7eb;
+            z-index: 100;
+        }
+
+        .bottom-nav a {
+            text-decoration: none;
+            color: var(--grey);
+            text-align: center;
+        }
+
+        .bottom-nav a.active {
+            color: var(--primary-blue);
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            .bottom-nav {
+                display: flex;
+            }
+            .container {
+                padding-bottom: 80px;
+            }
+        }
+
+        /* Auth Forms */
+        .auth-container {
+            max-width: 400px;
+            margin: 4rem auto;
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .user-type-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .user-type {
+            flex: 1;
+            text-align: center;
+            padding: 0.75rem;
+            cursor: pointer;
+            border-radius: 8px;
+            background: var(--light-grey);
+        }
+
+        .user-type.active {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        /* Dashboard */
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">SafeStay <span>Student</span></div>
+        <div class="nav-links">
+            <a href="#" onclick="showScreen('home')">Home</a>
+            <a href="#" onclick="showScreen('saved')">Saved</a>
+            <a href="#" onclick="showScreen('profile')">Profile</a>
+            <a href="#" onclick="logout()">Logout</a>
+        </div>
+    </nav>
+
+    <div class="bottom-nav">
+        <a href="#" onclick="showScreen('home')">🏠 Home</a>
+        <a href="#" onclick="showScreen('saved')">❤️ Saved</a>
+        <a href="#" onclick="showScreen('profile')">👤 Profile</a>
+    </div>
+
+    <div id="app" class="container">
+        <!-- Login Screen -->
+        <div id="loginScreen" class="auth-container">
+            <h2 style="text-align:center; margin-bottom:1rem;">SafeStay Student</h2>
+            <div class="user-type-selector">
+                <div class="user-type active" onclick="setUserType('student')">Student</div>
+                <div class="user-type" onclick="setUserType('landlord')">Landlord</div>
+                <div class="user-type" onclick="setUserType('admin')">Admin</div>
+            </div>
+            <div id="loginForm">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter your password">
+                </div>
+                <button class="btn btn-primary" style="width:100%;" onclick="login()">Login</button>
+                <p style="text-align:center; margin-top:1rem;">
+                    Don't have an account? <a href="#" onclick="showRegister()">Register</a>
+                </p>
+            </div>
+            <div id="registerForm" style="display:none;">
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" id="regFirstName">
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" id="regLastName">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="regEmail">
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="regPhone">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="regPassword">
+                </div>
+                <div id="studentFields">
+                    <div class="form-group">
+                        <label>Institution</label>
+                        <input type="text" id="regInstitution">
+                    </div>
+                    <div class="form-group">
+                        <label>Course</label>
+                        <input type="text" id="regCourse">
+                    </div>
+                    <div class="form-group">
+                        <label>Budget Range</label>
+                        <input type="text" id="regBudget" placeholder="e.g., R3000-R5000">
+                    </div>
+                    <div class="form-group">
+                        <label>Preferred Areas</label>
+                        <input type="text" id="regAreas" placeholder="e.g., Rondebosch, Mowbray">
+                    </div>
+                </div>
+                <button class="btn btn-primary" style="width:100%;" onclick="register()">Register</button>
+                <p style="text-align:center; margin-top:1rem;">
+                    Already have an account? <a href="#" onclick="showLogin()">Login</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Home Screen -->
+        <div id="homeScreen" style="display:none;">
+            <div class="search-section">
+                <h2>Find Safe Accommodation</h2>
+                <p>Verified listings near your campus</p>
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Enter location, campus, or suburb...">
+                    <button class="btn btn-primary" onclick="searchListings()">🔍 Search</button>
+                </div>
+            </div>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <label>Min Price (R)</label>
+                    <input type="number" id="minPrice" placeholder="0">
+                </div>
+                <div class="filter-group">
+                    <label>Max Price (R)</label>
+                    <input type="number" id="maxPrice" placeholder="10000">
+                </div>
+                <div class="filter-group">
+                    <label>Distance</label>
+                    <select id="distance">
+                        <option value="">Any</option>
+                        <option value="1">&lt; 1 km</option>
+                        <option value="3">&lt; 3 km</option>
+                        <option value="5">&lt; 5 km</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>NSFAS Approved</label>
+                    <select id="nsfas">
+                        <option value="">All</option>
+                        <option value="yes">Yes</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Room Type</label>
+                    <select id="roomType">
+                        <option value="">All</option>
+                        <option value="single">Single</option>
+                        <option value="shared">Shared</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+            </div>
+
+            <div id="listingsGrid" class="listings-grid">
+                <!-- Listings will be populated here -->
+            </div>
+        </div>
+
+        <!-- Saved Screen -->
+        <div id="savedScreen" style="display:none;">
+            <h2>Saved Listings</h2>
+            <div id="savedGrid" class="listings-grid">
+                <p>No saved listings yet.</p>
+            </div>
+        </div>
+
+        <!-- Profile Screen -->
+        <div id="profileScreen" style="display:none;">
+            <div class="auth-container" style="margin:0 auto;">
+                <h
